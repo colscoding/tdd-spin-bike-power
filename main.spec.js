@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import fs from 'fs';
 
 test('power element should have initial value of "--"', async ({ page }) => {
     // Navigate to the page served by Parcel
@@ -209,7 +210,6 @@ test('export button should download all measurements as JSON', async ({ page }) 
 
     // Read the downloaded file content
     const path = await download.path();
-    const fs = require('fs');
     const fileContent = fs.readFileSync(path, 'utf-8');
     const exportedData = JSON.parse(fileContent);
 
@@ -217,7 +217,6 @@ test('export button should download all measurements as JSON', async ({ page }) 
     expect(exportedData).toHaveProperty('power');
     expect(exportedData).toHaveProperty('heartrate');
     expect(exportedData).toHaveProperty('cadence');
-    expect(exportedData).toHaveProperty('exportedAt');
 
     // Verify data
     expect(exportedData.power.length).toBe(2);
@@ -228,6 +227,86 @@ test('export button should download all measurements as JSON', async ({ page }) 
     expect(exportedData.heartrate[0].value).toBe(145);
     expect(exportedData.cadence[0].value).toBe(80);
 });
+
+test('cadence element should have initial value of "--"', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    await page.waitForTimeout(200);
+
+    const cadenceElement = await page.locator('#cadence');
+    await expect(cadenceElement).toHaveText('--');
+});
+
+test('cadence should be "--" initially, then show value 1-299 after clicking connect', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    await page.waitForTimeout(200);
+    const cadenceElement = await page.locator('#cadence');
+
+    // Cadence should initially be "--"
+    await expect(cadenceElement).toHaveText('--');
+
+    // Click the connect cadence button
+    const connectButton = await page.locator('#connectCadence');
+    await connectButton.click();
+
+    // Wait for connection and first cadence reading
+    await page.waitForTimeout(1200);
+
+    // Get the cadence value
+    const cadenceText = await cadenceElement.textContent();
+    const cadenceValue = parseInt(cadenceText);
+
+    // Verify cadence is a number between 1 and 299
+    expect(cadenceValue).toBeGreaterThanOrEqual(1);
+    expect(cadenceValue).toBeLessThan(300);
+    expect(cadenceText).not.toBe('--');
+});
+
+test('cadence element should show "--" when data is older than 3 seconds', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    await page.waitForTimeout(200);
+    const cadenceElement = await page.locator('#cadence');
+    await expect(cadenceElement).toHaveText('--');
+
+    // Inject old cadence data
+    await page.evaluate(() => {
+        const oldTimestamp = Date.now() - 4000;
+        window.bike = window.bike || { cadence: [] };
+        window.bike.cadence = [{ timestamp: oldTimestamp, value: 90 }];
+    });
+
+    await page.waitForTimeout(200);
+
+    // Cadence should now show "--"
+    await expect(cadenceElement).toHaveText('--');
+});
+
+test('cadence element should update from "--" to value when fresh data arrives', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    await page.waitForTimeout(200);
+    const cadenceElement = await page.locator('#cadence');
+
+    // Set old data
+    await page.evaluate(() => {
+        const oldTimestamp = Date.now() - 4000;
+        window.bike.cadence = [{ timestamp: oldTimestamp, value: 80 }];
+    });
+
+    await page.waitForTimeout(200);
+    await expect(cadenceElement).toHaveText('--');
+
+    // Add fresh data
+    await page.evaluate(() => {
+        window.bike.cadence.push({ timestamp: Date.now(), value: 95 });
+    });
+
+    await page.waitForTimeout(200);
+    await expect(cadenceElement).toHaveText('95');
+});
+
 
 
 

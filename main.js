@@ -2,6 +2,7 @@ import { MeasurementsState } from './MeasurementsState.js';
 
 import { connectPower } from './connect-power.js';
 import { connectHeartRate } from './connect-heartrate.js';
+import { connectCadence } from './connect-cadence.js';
 
 const bikeMeasurements = new MeasurementsState();
 
@@ -18,6 +19,11 @@ const setPowerElement = (value) => {
 const setHeartrateElement = (value) => {
     const heartrateDiv = document.getElementById('heartrate');
     heartrateDiv.textContent = value.toString();
+}
+
+const setCadenceElement = (value) => {
+    const cadenceDiv = document.getElementById('cadence');
+    cadenceDiv.textContent = value.toString();
 }
 
 // Event loop to update power display every 100ms
@@ -55,12 +61,32 @@ const updateHeartrateDisplay = () => {
     }
 };
 
+const updateCadenceDisplay = () => {
+    const emptyValue = '--';
+    if (bikeMeasurements.cadence.length === 0) {
+        setCadenceElement(emptyValue);
+        return;
+    }
+
+    const latestCadence = bikeMeasurements.cadence[bikeMeasurements.cadence.length - 1];
+    const age = Date.now() - latestCadence.timestamp;
+
+    if (age < 3000) {
+        setCadenceElement(latestCadence.value);
+    } else {
+        setCadenceElement(emptyValue);
+    }
+};
+
 // Start the event loop
 setInterval(updatePowerDisplay, 100);
 setInterval(updateHeartrateDisplay, 100);
+setInterval(updateCadenceDisplay, 100);
 
 let disconnectPower = null;
 let disconnectHeartrate = null;
+let disconnectCadence = null;
+
 const connectPowerElem = document.getElementById('connectPower');
 connectPowerElem.addEventListener('click', async () => {
     try {
@@ -84,6 +110,19 @@ connectHeartrateElem.addEventListener('click', async () => {
         });
     } catch (error) {
         console.error('Error connecting heartrate:', error);
+    }
+});
+
+const connectCadenceElem = document.getElementById('connectCadence');
+connectCadenceElem.addEventListener('click', async () => {
+    try {
+        const { stop, addListener } = await connectCadence();
+        disconnectCadence = stop;
+        addListener((entry) => {
+            bikeMeasurements.addCadence(entry);
+        });
+    } catch (error) {
+        console.error('Error connecting cadence:', error);
     }
 });
 
