@@ -21,24 +21,22 @@ body {
 
 #metricsTable dt,
 #metricsTable dd {
-    padding: 16px 32px;
+    padding: 0.5rem 4rem;
     margin: 0;
 }
 
 #metricsTable dt {
     color: #666;
+    text-align: center;
     font-weight: 500;
-    font-size: 18px;
-    float: left;
-    clear: left;
-    width: 140px;
+    font-size: 1rem;
 }
 
 #metricsTable dd {
     font-weight: 700;
-    font-size: 32px;
+    font-size: 12rem;
     color: #667eea;
-    text-align: right;
+    text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
