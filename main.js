@@ -3,11 +3,11 @@ import { MeasurementsState } from './MeasurementsState.js';
 import { connectPower } from './connect-power.js';
 import { connectHeartRate } from './connect-heartrate.js';
 
-const bike = new MeasurementsState();
+const bikeMeasurements = new MeasurementsState();
 
 // Expose bike to window for testing
-if (typeof window !== 'undefined') {
-    window.bike = bike;
+if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
+    window.bike = bikeMeasurements;
 }
 
 const setPowerElement = (value) => {
@@ -23,12 +23,12 @@ const setHeartrateElement = (value) => {
 // Event loop to update power display every 100ms
 const updatePowerDisplay = () => {
     const emptyValue = '--';
-    if (bike.power.length === 0) {
+    if (bikeMeasurements.power.length === 0) {
         setPowerElement(emptyValue);
         return;
     }
 
-    const latestPower = bike.power[bike.power.length - 1];
+    const latestPower = bikeMeasurements.power[bikeMeasurements.power.length - 1];
     const age = Date.now() - latestPower.timestamp;
 
     if (age < 3000) {
@@ -40,12 +40,12 @@ const updatePowerDisplay = () => {
 
 const updateHeartrateDisplay = () => {
     const emptyValue = '--';
-    if (bike.heartrate.length === 0) {
+    if (bikeMeasurements.heartrate.length === 0) {
         setHeartrateElement(emptyValue);
         return;
     }
 
-    const latestHeartrate = bike.heartrate[bike.heartrate.length - 1];
+    const latestHeartrate = bikeMeasurements.heartrate[bikeMeasurements.heartrate.length - 1];
     const age = Date.now() - latestHeartrate.timestamp;
 
     if (age < 3000) {
@@ -67,7 +67,7 @@ connectPowerElem.addEventListener('click', async () => {
         const { stop, addListener } = await connectPower();
         disconnectPower = stop;
         addListener((entry) => {
-            bike.addPower(entry);
+            bikeMeasurements.addPower(entry);
         });
     } catch (error) {
         console.error('Error connecting power:', error);
@@ -80,10 +80,35 @@ connectHeartrateElem.addEventListener('click', async () => {
         const { stop, addListener } = await connectHeartRate();
         disconnectHeartrate = stop;
         addListener((entry) => {
-            bike.addHeartrate(entry);
+            bikeMeasurements.addHeartrate(entry);
         });
     } catch (error) {
         console.error('Error connecting heartrate:', error);
     }
 });
 
+const exportDataElem = document.getElementById('exportData');
+exportDataElem.addEventListener('click', () => {
+    try {
+        // Create export data object with all measurements
+        const exportData = {
+            power: bikeMeasurements.power,
+            heartrate: bikeMeasurements.heartrate,
+            cadence: bikeMeasurements.cadence,
+        };
+
+        // Convert to JSON
+        const jsonString = JSON.stringify(exportData, null, 2);
+
+        // Create blob and download link
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bike-measurements-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error exporting data:', error);
+    }
+});

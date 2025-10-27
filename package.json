@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "node --test",
-    "test:watch": "node --test --watch",
+    "test": "NODE_ENV=test node --test",
+    "test:watch": "NODE_ENV=test node --test --watch",
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e": "NODE_ENV=test playwright test",
+    "test:e2e:ui": "NODE_ENV=test playwright test --ui"
   },
   "keywords": [],
   "author": "",
