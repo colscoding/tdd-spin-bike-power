@@ -1,0 +1,23 @@
+{
+  "name": "tdd-spin-bike-power",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "jsdom": "^27.0.1",
+    "parcel": "^2.16.0",
+    "vitest": "^4.0.4"
+  }
+}
