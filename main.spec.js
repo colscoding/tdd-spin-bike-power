@@ -73,6 +73,10 @@ test('power should be "--" initially, then show value 0-3000 after clicking conn
     // Power should initially be "--"
     await expect(powerElement).toHaveText('--');
 
+    // Open the menu
+    const menu = await page.locator('summary');
+    await menu.click();
+
     // Click the connect button
     const connectButton = await page.locator('#connectPower');
     await connectButton.click();
@@ -111,6 +115,10 @@ test('heartrate should be "--" initially, then show value 1-299 after clicking c
 
     // Heartrate should initially be "--"
     await expect(heartrateElement).toHaveText('--');
+
+    // Open the menu
+    const menu = await page.locator('summary');
+    await menu.click();
 
     // Click the connect heartrate button
     const connectButton = await page.locator('#connectHeartrate');
@@ -194,6 +202,10 @@ test('export button should download all measurements as JSON', async ({ page }) 
     // Wait a moment for data to be added
     await page.waitForTimeout(100);
 
+    // Open the menu
+    const menu = await page.locator('summary');
+    await menu.click();
+
     // Set up download listener
     const downloadPromise = page.waitForEvent('download');
 
@@ -245,6 +257,10 @@ test('cadence should be "--" initially, then show value 1-299 after clicking con
 
     // Cadence should initially be "--"
     await expect(cadenceElement).toHaveText('--');
+
+    // Open the menu
+    const menu = await page.locator('summary');
+    await menu.click();
 
     // Click the connect cadence button
     const connectButton = await page.locator('#connectCadence');

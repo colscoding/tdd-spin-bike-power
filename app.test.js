@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert');
-const { SpinBike } = require('./MeasurementsState.js');
+import { test } from 'node:test';
+import assert from 'node:assert';
+import { MeasurementsState } from './MeasurementsState.js';
 
-test('SpinBike should add cadence measurement with timestamp and value', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should add cadence measurement with timestamp and value', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
     const value = 80
     bike.addCadence({ timestamp, value });
@@ -13,8 +13,8 @@ test('SpinBike should add cadence measurement with timestamp and value', () => {
     assert.strictEqual(bike.cadence[0].timestamp, timestamp);
 });
 
-test('SpinBike should add power measurement with timestamp and value', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should add power measurement with timestamp and value', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
     const value = 250;
     bike.addPower({ timestamp, value });
@@ -24,8 +24,8 @@ test('SpinBike should add power measurement with timestamp and value', () => {
     assert.strictEqual(bike.power[0].timestamp, timestamp);
 });
 
-test('SpinBike should add heartrate measurement with timestamp and value', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should add heartrate measurement with timestamp and value', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
     const value = 145;
     bike.addHeartrate({ timestamp, value });
@@ -35,8 +35,8 @@ test('SpinBike should add heartrate measurement with timestamp and value', () =>
     assert.strictEqual(bike.heartrate[0].timestamp, timestamp);
 });
 
-test('SpinBike should throw error for heartrate 0 or lower', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for heartrate 0 or lower', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
@@ -50,8 +50,8 @@ test('SpinBike should throw error for heartrate 0 or lower', () => {
     assert.strictEqual(bike.heartrate.length, 0);
 });
 
-test('SpinBike should throw error for heartrate 300 or higher', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for heartrate 300 or higher', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
@@ -65,8 +65,8 @@ test('SpinBike should throw error for heartrate 300 or higher', () => {
     assert.strictEqual(bike.heartrate.length, 0);
 });
 
-test('SpinBike should throw error for power 0 or lower', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for power 0 or lower', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
@@ -80,8 +80,8 @@ test('SpinBike should throw error for power 0 or lower', () => {
     assert.strictEqual(bike.power.length, 0);
 });
 
-test('SpinBike should throw error for power higher than 2999', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for power higher than 2999', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
@@ -95,8 +95,8 @@ test('SpinBike should throw error for power higher than 2999', () => {
     assert.strictEqual(bike.power.length, 0);
 });
 
-test('SpinBike should throw error for cadence 0 or lower', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for cadence 0 or lower', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
@@ -111,8 +111,8 @@ test('SpinBike should throw error for cadence 0 or lower', () => {
 });
 
 
-test('SpinBike should throw error for cadence 300 or higher', () => {
-    const bike = new SpinBike();
+test('MeasurementsState should throw error for cadence 300 or higher', () => {
+    const bike = new MeasurementsState();
     const timestamp = Date.now();
 
     assert.throws(() => {
