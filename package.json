@@ -7,7 +7,7 @@
     "test:watch": "NODE_ENV=test node --test --watch",
     "start": "parcel index.html",
     "start:test": "NODE_ENV=test parcel index.html",
-    "build": "parcel build index.html --public-url",
+    "build": "rm -rf dist/ && parcel build index.html --public-url ./",
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:ui": "NODE_ENV=test playwright test --ui"
   },
