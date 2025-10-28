@@ -24,7 +24,7 @@ test('power element should show "--" when data is older than 3 seconds', async (
     // Inject old power data by manipulating the bike object
     await page.evaluate(() => {
         // Access the bike object and add old power measurement
-        const oldTimestamp = Date.now() - 4000; // 4 seconds old
+        const oldTimestamp = Date.now() - 61000; // 61 seconds old
         window.bike = window.bike || { power: [] };
         window.bike.power = [{ timestamp: oldTimestamp, value: 200 }];
     });
@@ -45,7 +45,7 @@ test('power element should update from "--" to value when fresh data arrives', a
 
     // Set old data
     await page.evaluate(() => {
-        const oldTimestamp = Date.now() - 4000;
+        const oldTimestamp = Date.now() - 61000;
         window.bike.power = [{ timestamp: oldTimestamp, value: 100 }];
     });
 
@@ -148,7 +148,7 @@ test('heartrate element should show "--" when data is older than 3 seconds', asy
     // Inject old heartrate data by manipulating the bike object
     await page.evaluate(() => {
         // Access the bike object and add old heartrate measurement
-        const oldTimestamp = Date.now() - 4000; // 4 seconds old
+        const oldTimestamp = Date.now() - 61000; // 61 seconds old
         window.bike = window.bike || { heartrate: [] };
         window.bike.heartrate = [{ timestamp: oldTimestamp, value: 150 }];
     });
@@ -169,7 +169,7 @@ test('heartrate element should update from "--" to value when fresh data arrives
 
     // Set old data
     await page.evaluate(() => {
-        const oldTimestamp = Date.now() - 4000;
+        const oldTimestamp = Date.now() - 61000;
         window.bike.heartrate = [{ timestamp: oldTimestamp, value: 120 }];
     });
 
@@ -288,7 +288,7 @@ test('cadence element should show "--" when data is older than 3 seconds', async
 
     // Inject old cadence data
     await page.evaluate(() => {
-        const oldTimestamp = Date.now() - 4000;
+        const oldTimestamp = Date.now() - 61000;
         window.bike = window.bike || { cadence: [] };
         window.bike.cadence = [{ timestamp: oldTimestamp, value: 90 }];
     });
@@ -307,7 +307,7 @@ test('cadence element should update from "--" to value when fresh data arrives',
 
     // Set old data
     await page.evaluate(() => {
-        const oldTimestamp = Date.now() - 4000;
+        const oldTimestamp = Date.now() - 61000;
         window.bike.cadence = [{ timestamp: oldTimestamp, value: 80 }];
     });
 

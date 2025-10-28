@@ -37,7 +37,7 @@ const updatePowerDisplay = () => {
     const latestPower = bikeMeasurements.power[bikeMeasurements.power.length - 1];
     const age = Date.now() - latestPower.timestamp;
 
-    if (age < 3000) {
+    if (age < 60000) {
         setPowerElement(latestPower.value);
     } else {
         setPowerElement(emptyValue);
@@ -54,7 +54,7 @@ const updateHeartrateDisplay = () => {
     const latestHeartrate = bikeMeasurements.heartrate[bikeMeasurements.heartrate.length - 1];
     const age = Date.now() - latestHeartrate.timestamp;
 
-    if (age < 3000) {
+    if (age < 60000) {
         setHeartrateElement(latestHeartrate.value);
     } else {
         setHeartrateElement(emptyValue);
@@ -71,7 +71,7 @@ const updateCadenceDisplay = () => {
     const latestCadence = bikeMeasurements.cadence[bikeMeasurements.cadence.length - 1];
     const age = Date.now() - latestCadence.timestamp;
 
-    if (age < 3000) {
+    if (age < 60000) {
         setCadenceElement(latestCadence.value);
     } else {
         setCadenceElement(emptyValue);
