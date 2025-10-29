@@ -11,7 +11,20 @@
 </head>
 
 <body>
-    <div>
+    <header>
+        <details>
+            <summary>☰</summary>
+            <div id="controls">
+                <button id="connectPower">Connect Power</button>
+                <button id="connectCadence">Connect Cadence</button>
+                <button id="connectHeartrate">Connect Heartrate</button>
+                <button id="exportData">Export Data</button>
+            </div>
+        </details>
+        <h1>Spin Bike Power</h1>
+    </header>
+
+    <main>
         <dl id="metricsTable">
             <dt>Power</dt>
             <dd id="power"></dd>
@@ -20,16 +33,7 @@
             <dt>Heart Rate</dt>
             <dd id="heartrate"></dd>
         </dl>
-    </div>
-    <details>
-        <summary>☰</summary>
-        <div id="controls">
-            <button id="connectPower">Connect Power</button>
-            <button id="connectCadence">Connect Cadence</button>
-            <button id="connectHeartrate">Connect Heartrate</button>
-            <button id="exportData">Export Data</button>
-        </div>
-    </details>
+    </main>
 </body>
 
 </html>
