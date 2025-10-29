@@ -15,6 +15,13 @@ const powerDiv = document.getElementById('power');
 const heartrateDiv = document.getElementById('heartrate');
 const cadenceDiv = document.getElementById('cadence');
 
+
+
+let powerIsConnected = false;
+let stopPower = null;
+let stopHeartrate = null;
+let stopCadence = null;
+
 const setPowerElement = (value) => {
     powerDiv.textContent = value.toString();
 }
@@ -48,7 +55,13 @@ const updateMetricDisplay = (getMeasurementArray, setElement) => {
 const updatePowerDisplay = () => {
     updateMetricDisplay(
         () => bikeMeasurements.power,
-        setPowerElement
+        (value) => {
+            if (powerIsConnected) {
+                setPowerElement(value);
+            } else {
+                setPowerElement('--');
+            }
+        }
     );
 };
 
@@ -71,20 +84,34 @@ setInterval(updatePowerDisplay, 100);
 setInterval(updateHeartrateDisplay, 100);
 setInterval(updateCadenceDisplay, 100);
 
-let disconnectPower = null;
-let disconnectHeartrate = null;
-let disconnectCadence = null;
-
-const connectPowerElem = document.getElementById('connectPower');
-connectPowerElem.addEventListener('click', async () => {
+const disconnectPower = () => {
+    if (typeof stopPower === 'function') {
+        stopPower();
+        stopPower = null;
+        powerIsConnected = false;
+        connectPowerElem.textContent = 'Connect Power';
+        setPowerElement('--');
+    }
+}
+const connectPowerFn = async () => {
     try {
         const { stop, addListener } = await connectPower();
-        disconnectPower = stop;
+        stopPower = stop;
         addListener((entry) => {
             bikeMeasurements.addPower(entry);
         });
+        powerIsConnected = true;
+        connectPowerElem.textContent = 'Disconnect Power';
     } catch (error) {
         console.error('Error connecting power:', error);
+    }
+}
+const connectPowerElem = document.getElementById('connectPower');
+connectPowerElem.addEventListener('click', async () => {
+    if (powerIsConnected) {
+        disconnectPower();
+    } else {
+        connectPowerFn();
     }
 });
 
@@ -92,7 +119,7 @@ const connectHeartrateElem = document.getElementById('connectHeartrate');
 connectHeartrateElem.addEventListener('click', async () => {
     try {
         const { stop, addListener } = await connectHeartRate();
-        disconnectHeartrate = stop;
+        stopHeartrate = stop;
         addListener((entry) => {
             bikeMeasurements.addHeartrate(entry);
         });
@@ -105,7 +132,7 @@ const connectCadenceElem = document.getElementById('connectCadence');
 connectCadenceElem.addEventListener('click', async () => {
     try {
         const { stop, addListener } = await connectCadence();
-        disconnectCadence = stop;
+        stopCadence = stop;
         addListener((entry) => {
             bikeMeasurements.addCadence(entry);
         });

@@ -323,6 +323,40 @@ test('cadence element should update from "--" to value when fresh data arrives',
     await expect(cadenceElement).toHaveText('95');
 });
 
+test('connect power button should toggle to disconnect and back', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    // Open the menu
+    const menu = await page.locator('summary');
+    await menu.click();
+
+    const connectButton = await page.locator('#connectPower');
+    const powerElement = await page.locator('#power');
+
+    // Initial state - button should say "Connect Power"
+    await expect(connectButton).toHaveText('Connect Power');
+    await expect(powerElement).toHaveText('--');
+
+    // Click to connect
+    await connectButton.click();
+    await page.waitForTimeout(400);
+
+    // After connecting - button should say "Disconnect Power" and data should show
+    await expect(connectButton).toHaveText('Disconnect Power');
+    const powerText = await powerElement.textContent();
+    expect(powerText).not.toBe('--');
+    const powerValue = parseInt(powerText);
+    expect(powerValue).toBeGreaterThanOrEqual(0);
+    expect(powerValue).toBeLessThanOrEqual(3000);
+
+    // Click to disconnect
+    await connectButton.click();
+    await page.waitForTimeout(200);
+
+    // After disconnecting - button should say "Connect Power" and value should return to "--"
+    await expect(connectButton).toHaveText('Connect Power');
+    await expect(powerElement).toHaveText('--');
+});
 
 
 
