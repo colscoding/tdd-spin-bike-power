@@ -11,71 +11,59 @@ if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
     window.bike = bikeMeasurements;
 }
 
+const powerDiv = document.getElementById('power');
+const heartrateDiv = document.getElementById('heartrate');
+const cadenceDiv = document.getElementById('cadence');
+
 const setPowerElement = (value) => {
-    const powerDiv = document.getElementById('power');
     powerDiv.textContent = value.toString();
 }
 
 const setHeartrateElement = (value) => {
-    const heartrateDiv = document.getElementById('heartrate');
     heartrateDiv.textContent = value.toString();
 }
 
 const setCadenceElement = (value) => {
-    const cadenceDiv = document.getElementById('cadence');
     cadenceDiv.textContent = value.toString();
 }
 
-// Event loop to update power display every 100ms
-const updatePowerDisplay = () => {
+const updateMetricDisplay = (getMeasurementArray, setElement) => {
     const emptyValue = '--';
-    if (bikeMeasurements.power.length === 0) {
-        setPowerElement(emptyValue);
+    const arr = getMeasurementArray();
+    if (!Array.isArray(arr) || arr.length === 0) {
+        setElement(emptyValue);
         return;
     }
 
-    const latestPower = bikeMeasurements.power[bikeMeasurements.power.length - 1];
-    const age = Date.now() - latestPower.timestamp;
+    const latestMeasurement = arr[arr.length - 1];
+    const age = Date.now() - latestMeasurement.timestamp;
 
     if (age < 60000) {
-        setPowerElement(latestPower.value);
+        setElement(latestMeasurement.value);
     } else {
-        setPowerElement(emptyValue);
+        setElement(emptyValue);
     }
+};
+
+const updatePowerDisplay = () => {
+    updateMetricDisplay(
+        () => bikeMeasurements.power,
+        setPowerElement
+    );
 };
 
 const updateHeartrateDisplay = () => {
-    const emptyValue = '--';
-    if (bikeMeasurements.heartrate.length === 0) {
-        setHeartrateElement(emptyValue);
-        return;
-    }
-
-    const latestHeartrate = bikeMeasurements.heartrate[bikeMeasurements.heartrate.length - 1];
-    const age = Date.now() - latestHeartrate.timestamp;
-
-    if (age < 60000) {
-        setHeartrateElement(latestHeartrate.value);
-    } else {
-        setHeartrateElement(emptyValue);
-    }
+    updateMetricDisplay(
+        () => bikeMeasurements.heartrate,
+        setHeartrateElement
+    );
 };
 
 const updateCadenceDisplay = () => {
-    const emptyValue = '--';
-    if (bikeMeasurements.cadence.length === 0) {
-        setCadenceElement(emptyValue);
-        return;
-    }
-
-    const latestCadence = bikeMeasurements.cadence[bikeMeasurements.cadence.length - 1];
-    const age = Date.now() - latestCadence.timestamp;
-
-    if (age < 60000) {
-        setCadenceElement(latestCadence.value);
-    } else {
-        setCadenceElement(emptyValue);
-    }
+    updateMetricDisplay(
+        () => bikeMeasurements.cadence,
+        setCadenceElement
+    );
 };
 
 // Start the event loop
