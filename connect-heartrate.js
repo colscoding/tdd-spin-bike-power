@@ -8,7 +8,7 @@ export const connectHeartRateMock = async () => {
     }, 1000);
 
     return {
-        stop: () => clearInterval(heartRateInterval),
+        disconnect: () => clearInterval(heartRateInterval),
         addListener: (callback) => {
             listeners.push(callback);
         }
@@ -46,7 +46,7 @@ export const connectHeartRateBluetooth = async () => {
     });
 
     return {
-        stop: () => {
+        disconnect: () => {
             characteristic.stopNotifications();
             device.gatt.disconnect();
         },

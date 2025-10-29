@@ -8,7 +8,7 @@ export const connectPowerMock = async () => {
     }, 100);
 
     return {
-        stop: () => clearInterval(powerInterval),
+        disconnect: () => clearInterval(powerInterval),
         addListener: (callback) => {
             listeners.push(callback);
         }
@@ -46,7 +46,7 @@ export const connectPowerBluetooth = async () => {
     });
 
     return {
-        stop: () => {
+        disconnect: () => {
             characteristic.stopNotifications();
             device.gatt.disconnect();
         },

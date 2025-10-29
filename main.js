@@ -11,133 +11,122 @@ if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
     window.bike = bikeMeasurements;
 }
 
-const powerDiv = document.getElementById('power');
-const heartrateDiv = document.getElementById('heartrate');
-const cadenceDiv = document.getElementById('cadence');
+const metricTypes = ['power', 'heartrate', 'cadence'];
 
+const powerElement = document.getElementById('power');
+const heartrateElement = document.getElementById('heartrate');
+const cadenceElement = document.getElementById('cadence');
 
+const connectPowerElem = document.getElementById('connectPower');
+const connectHeartrateElem = document.getElementById('connectHeartrate');
+const connectCadenceElem = document.getElementById('connectCadence');
 
-let powerIsConnected = false;
-let stopPower = null;
-let stopHeartrate = null;
-let stopCadence = null;
-
-const setPowerElement = (value) => {
-    powerDiv.textContent = value.toString();
+const elements = {
+    power: { display: powerElement, connect: connectPowerElem },
+    heartrate: { display: heartrateElement, connect: connectHeartrateElem },
+    cadence: { display: cadenceElement, connect: connectCadenceElem },
 }
 
-const setHeartrateElement = (value) => {
-    heartrateDiv.textContent = value.toString();
+const connectFns = {
+    power: connectPower,
+    heartrate: connectHeartRate,
+    cadence: connectCadence,
+};
+
+const emojis = {
+    power: '⚡',
+    heartrate: '❤️',
+    cadence: '🚴',
+};
+
+const state = {
+    power: {
+        isConnected: false,
+        disconnect: null,
+    },
+    heartrate: {
+        isConnected: false,
+        disconnect: null,
+    },
+    cadence: {
+        isConnected: false,
+        disconnect: null,
+    }
 }
 
-const setCadenceElement = (value) => {
-    cadenceDiv.textContent = value.toString();
-}
+const updateMetricDisplay = (key) => {
+    const element = elements?.[key]?.display;
+    if (!element || !state?.[key]) {
+        return;
+    }
 
-const updateMetricDisplay = (getMeasurementArray, setElement) => {
     const emptyValue = '--';
-    const arr = getMeasurementArray();
+
+    if (!state?.[key]?.isConnected) {
+        element.textContent = emptyValue;
+        return;
+    }
+    const arr = bikeMeasurements[key];
     if (!Array.isArray(arr) || arr.length === 0) {
-        setElement(emptyValue);
+        element.textContent = emptyValue;
         return;
     }
 
     const latestMeasurement = arr[arr.length - 1];
-    const age = Date.now() - latestMeasurement.timestamp;
-
-    if (age < 60000) {
-        setElement(latestMeasurement.value);
-    } else {
-        setElement(emptyValue);
-    }
-};
-
-const updatePowerDisplay = () => {
-    updateMetricDisplay(
-        () => bikeMeasurements.power,
-        (value) => {
-            if (powerIsConnected) {
-                setPowerElement(value);
-            } else {
-                setPowerElement('--');
-            }
-        }
-    );
-};
-
-const updateHeartrateDisplay = () => {
-    updateMetricDisplay(
-        () => bikeMeasurements.heartrate,
-        setHeartrateElement
-    );
-};
-
-const updateCadenceDisplay = () => {
-    updateMetricDisplay(
-        () => bikeMeasurements.cadence,
-        setCadenceElement
-    );
-};
+    element.textContent = latestMeasurement.value;
+}
 
 // Start the event loop
-setInterval(updatePowerDisplay, 100);
-setInterval(updateHeartrateDisplay, 100);
-setInterval(updateCadenceDisplay, 100);
+setInterval(() => {
+    metricTypes.forEach(updateMetricDisplay);
+}, 100);
 
-const disconnectPower = () => {
-    if (typeof stopPower === 'function') {
-        stopPower();
-        stopPower = null;
-        powerIsConnected = false;
-        connectPowerElem.textContent = 'Connect Power';
-        setPowerElement('--');
+const disconnectFn = (key) => {
+    if (typeof state[key].disconnect === 'function') {
+        state[key].disconnect();
+        state[key].disconnect = null;
+        state[key].isConnected = false;
+        const connectElem = elements[key]?.connect;
+        if (connectElem?.textContent) {
+            connectElem.textContent = `${emojis[key]} Connect ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+        }
+        const displayElem = elements?.[key]?.display;
+        if (displayElem?.textContent) {
+            displayElem.textContent = '--';
+        }
     }
 }
-const connectPowerFn = async () => {
-    try {
-        const { stop, addListener } = await connectPower();
-        stopPower = stop;
-        addListener((entry) => {
-            bikeMeasurements.addPower(entry);
-        });
-        powerIsConnected = true;
-        connectPowerElem.textContent = 'Disconnect Power';
-    } catch (error) {
-        console.error('Error connecting power:', error);
-    }
-}
-const connectPowerElem = document.getElementById('connectPower');
-connectPowerElem.addEventListener('click', async () => {
-    if (powerIsConnected) {
-        disconnectPower();
-    } else {
-        connectPowerFn();
-    }
-});
 
-const connectHeartrateElem = document.getElementById('connectHeartrate');
-connectHeartrateElem.addEventListener('click', async () => {
+const connectFn = async (key) => {
     try {
-        const { stop, addListener } = await connectHeartRate();
-        stopHeartrate = stop;
-        addListener((entry) => {
-            bikeMeasurements.addHeartrate(entry);
-        });
-    } catch (error) {
-        console.error('Error connecting heartrate:', error);
-    }
-});
+        const { disconnect, addListener } = await connectFns[key]();
 
-const connectCadenceElem = document.getElementById('connectCadence');
-connectCadenceElem.addEventListener('click', async () => {
-    try {
-        const { stop, addListener } = await connectCadence();
-        stopCadence = stop;
+        state[key].disconnect = disconnect;
+        state[key].isConnected = true;
+
         addListener((entry) => {
-            bikeMeasurements.addCadence(entry);
+            bikeMeasurements.add(key, entry);
         });
+
+        const connectElem = elements[key]?.connect;
+        if (connectElem?.textContent) {
+            connectElem.textContent = `${emojis[key]} Disconnect ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+        }
     } catch (error) {
-        console.error('Error connecting cadence:', error);
+        console.error(`Error connecting ${key}:`, error);
+    }
+};
+
+metricTypes.forEach((key) => {
+    const connectElem = elements[key]?.connect;
+    if (connectElem) {
+        connectElem.addEventListener('click', async () => {
+            if (state[key].isConnected) {
+                disconnectFn(key);
+            } else {
+                connectFn(key);
+            }
+        });
     }
 });
 

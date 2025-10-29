@@ -34,6 +34,18 @@ class MeasurementsState {
             value: value
         });
     }
+
+    add(type, entry) {
+        if (type === 'heartrate') {
+            this.addHeartrate(entry);
+        } else if (type === 'power') {
+            this.addPower(entry);
+        } else if (type === 'cadence') {
+            this.addCadence(entry);
+        } else {
+            throw new Error(`Unknown measurement type: ${type}`);
+        }
+    }
 }
 
 export { MeasurementsState };

@@ -86,19 +86,25 @@ summary::-webkit-details-marker {
 
 /* Menu buttons */
 #controls button {
-    padding: 10px 16px;
+    padding: 8px 12px;
     font-size: 14px;
     border: none;
-    border-radius: 4px;
-    background-color: #f5f5f5;
+    border-radius: 6px;
+    background-color: transparent;
     cursor: pointer;
     white-space: nowrap;
     text-align: left;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s ease;
+    color: #1f2328;
+    font-weight: 400;
 }
 
 #controls button:hover {
-    background-color: #e8e8e8;
+    background-color: #0969da14;
+}
+
+#controls button:active {
+    background-color: #0969da26;
 }
 
 /* Metrics table */

@@ -7,7 +7,7 @@ export const connectCadenceMock = async () => {
     }, 1000);
 
     return {
-        stop: () => clearInterval(cadenceInterval),
+        disconnect: () => clearInterval(cadenceInterval),
         addListener: (callback) => {
             listeners.push(callback);
         }
@@ -56,7 +56,7 @@ export const connectCadenceBluetooth = async () => {
     });
 
     return {
-        stop: () => {
+        disconnect: () => {
             characteristic.stopNotifications();
             device.gatt.disconnect();
         },
