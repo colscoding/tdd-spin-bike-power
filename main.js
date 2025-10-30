@@ -3,6 +3,7 @@ import { MeasurementsState } from './MeasurementsState.js';
 import { connectPower } from './connect-power.js';
 import { connectHeartRate } from './connect-heartrate.js';
 import { connectCadence } from './connect-cadence.js';
+import { getTcxString } from './create-tcx.js';
 
 const bikeMeasurements = new MeasurementsState();
 
@@ -10,6 +11,36 @@ const bikeMeasurements = new MeasurementsState();
 if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
     window.bike = bikeMeasurements;
 }
+
+// Keep screen awake during workout
+let wakeLock = null;
+const requestWakeLock = async () => {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Screen wake lock activated');
+
+            // Re-request wake lock if page becomes visible again
+            wakeLock.addEventListener('release', () => {
+                console.log('Screen wake lock released');
+            });
+        }
+    } catch (err) {
+        console.error('Wake lock request failed:', err);
+    }
+};
+
+// Request wake lock when page loads
+if (document.visibilityState === 'visible') {
+    requestWakeLock();
+}
+
+// Re-request wake lock when page becomes visible
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        requestWakeLock();
+    }
+});
 
 const metricTypes = ['power', 'heartrate', 'cadence'];
 
@@ -59,9 +90,7 @@ const updateMetricDisplay = (key) => {
     if (!element || !state?.[key]) {
         return;
     }
-
     const emptyValue = '--';
-
     if (!state?.[key]?.isConnected) {
         element.textContent = emptyValue;
         return;
@@ -73,6 +102,17 @@ const updateMetricDisplay = (key) => {
     }
 
     const latestMeasurement = arr[arr.length - 1];
+    if (!latestMeasurement || typeof latestMeasurement.value !== 'number' || typeof latestMeasurement.timestamp !== 'number') {
+        element.textContent = emptyValue;
+        return;
+    }
+    const timeDiff = Date.now() - latestMeasurement.timestamp;
+    // If data is older than 5 seconds, show as disconnected
+    if (timeDiff > 5000) {
+        element.textContent = emptyValue;
+        return;
+    }
+
     element.textContent = latestMeasurement.value;
 }
 
@@ -133,6 +173,8 @@ metricTypes.forEach((key) => {
 const exportDataElem = document.getElementById('exportData');
 exportDataElem.addEventListener('click', () => {
     try {
+        const timestamp = Date.now();
+
         // Create export data object with all measurements
         const exportData = {
             power: bikeMeasurements.power,
@@ -140,17 +182,25 @@ exportDataElem.addEventListener('click', () => {
             cadence: bikeMeasurements.cadence,
         };
 
-        // Convert to JSON
+        // Download JSON file
         const jsonString = JSON.stringify(exportData, null, 2);
+        const jsonBlob = new Blob([jsonString], { type: 'application/json' });
+        const jsonUrl = URL.createObjectURL(jsonBlob);
+        const jsonLink = document.createElement('a');
+        jsonLink.href = jsonUrl;
+        jsonLink.download = `bike-measurements-${timestamp}.json`;
+        jsonLink.click();
+        URL.revokeObjectURL(jsonUrl);
 
-        // Create blob and download link
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `bike-measurements-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+        // Download TCX file
+        const tcxString = getTcxString(bikeMeasurements);
+        const tcxBlob = new Blob([tcxString], { type: 'application/xml' });
+        const tcxUrl = URL.createObjectURL(tcxBlob);
+        const tcxLink = document.createElement('a');
+        tcxLink.href = tcxUrl;
+        tcxLink.download = `bike-workout-${timestamp}.tcx`;
+        tcxLink.click();
+        URL.revokeObjectURL(tcxUrl);
     } catch (error) {
         console.error('Error exporting data:', error);
     }

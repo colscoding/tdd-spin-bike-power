@@ -16,6 +16,8 @@ export const connectCadenceMock = async () => {
 
 export const connectCadenceBluetooth = async () => {
     const listeners = [];
+    let lastCrankRevs = null;
+    let lastCrankTime = null;
 
     // Request Bluetooth device with cycling speed and cadence service
     const device = await navigator.bluetooth.requestDevice({
@@ -40,18 +42,47 @@ export const connectCadenceBluetooth = async () => {
         const value = event.target.value;
         const flags = value.getUint8(0);
 
-        // Check if cadence data is present (bit 1 of flags)
+        // Check if crank revolution data is present (bit 1 of flags)
         if (flags & 0x02) {
-            // Cadence is in bytes 5-6 (revolutions) - we calculate RPM from revolution count
-            const cadenceRevs = value.getUint16(5, true);
-            const cadenceTime = value.getUint16(7, true);
+            // Crank revolution data format:
+            // - Cumulative Crank Revolutions (uint16, bytes 1-2 or 5-6 depending on wheel data)
+            // - Last Crank Event Time (uint16, bytes 3-4 or 7-8, units: 1/1024 seconds)
 
-            // For simplicity, use a derived cadence value
-            // In real implementation, you'd track deltas between measurements
-            const cadence = Math.round((cadenceRevs / cadenceTime) * 60 * 1024);
+            let offset = 1; // Start after flags byte
 
-            const entry = { timestamp: Date.now(), value: cadence };
-            listeners.forEach(listener => listener(entry));
+            // If wheel revolution data is present (bit 0), skip it (4 bytes)
+            if (flags & 0x01) {
+                offset = 5;
+            }
+
+            const crankRevs = value.getUint16(offset, true);
+            const crankTime = value.getUint16(offset + 2, true); // Units: 1/1024 seconds
+
+            // Calculate RPM from delta between measurements
+            if (lastCrankRevs !== null && lastCrankTime !== null) {
+                let revDelta = crankRevs - lastCrankRevs;
+                let timeDelta = crankTime - lastCrankTime;
+
+                // Handle rollover (uint16 max is 65535)
+                if (revDelta < 0) revDelta += 65536;
+                if (timeDelta < 0) timeDelta += 65536;
+
+                // Calculate RPM: (revolutions / time_in_seconds) * 60
+                // Time is in 1/1024 seconds, so convert to seconds
+                if (timeDelta > 0) {
+                    const timeInSeconds = timeDelta / 1024;
+                    const rpm = Math.round((revDelta / timeInSeconds) * 60);
+
+                    // Sanity check for reasonable cadence values
+                    if (rpm > 0 && rpm < 300) {
+                        const entry = { timestamp: Date.now(), value: rpm };
+                        listeners.forEach(listener => listener(entry));
+                    }
+                }
+            }
+
+            lastCrankRevs = crankRevs;
+            lastCrankTime = crankTime;
         }
     });
 
