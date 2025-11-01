@@ -1,4 +1,4 @@
-import { MeasurementsState } from "./MeasurementsState"
+import { MeasurementsState } from "./MeasurementsState.js"
 
 
 export const getValuesAtTimestamps = (arr, timestamps) => {
@@ -96,11 +96,11 @@ const getTcxTrackpoint = (point) => {
 
 /**
  * Creates a Garmin TCX (Training Center XML) string from merged measurements
- * @param {Array<{timestamp: number, heartrate: number|null, cadence: number|null, power: number|null}>} dataPoints - Merged measurement data points
- * @param {string} startTime - ISO 8601 formatted start time (optional, defaults to first timestamp)
+ * @param {MeasurementsState} measurements - Merged measurement data points
  * @returns {string} TCX formatted XML string
  */
-export const createTcxString = (dataPoints, startTime) => {
+export const getTcxString = (measurements) => {
+    const dataPoints = mergeMeasurements(measurements);
     if (!dataPoints || dataPoints.length === 0) {
         return '';
     }
@@ -108,9 +108,9 @@ export const createTcxString = (dataPoints, startTime) => {
     const firstTimestamp = dataPoints[0].timestamp;
     const lastTimestamp = dataPoints[dataPoints.length - 1].timestamp;
     const totalTimeSeconds = Math.round((lastTimestamp - firstTimestamp) / 1000);
-    const startDate = startTime || new Date(firstTimestamp).toISOString();
+    const startDate = new Date(firstTimestamp).toISOString();
 
-    const tcx = `<? xml version = "1.0" encoding = "UTF-8" ?>
+    const tcx = `<?xml version="1.0" encoding="UTF-8"?>
     <TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">
         <Activities>
             <Activity Sport="Biking">
