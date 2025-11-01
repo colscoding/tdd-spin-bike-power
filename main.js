@@ -209,7 +209,8 @@ exportDataElem.addEventListener('click', () => {
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'test') {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        const swUrl = new URL('sw.js', document.baseURI).href;
+        navigator.serviceWorker.register(swUrl)
             .then(registration => {
                 console.log('Service Worker registered successfully:', registration.scope);
             })

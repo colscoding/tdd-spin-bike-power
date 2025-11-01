@@ -17,8 +17,15 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
+                console.log('Opened cache:', CACHE_NAME);
+                // Try to cache resources, but don't fail if some are missing
+                return Promise.allSettled(
+                    urlsToCache.map(url =>
+                        cache.add(url).catch(err => {
+                            console.warn(`Failed to cache ${url}:`, err);
+                        })
+                    )
+                );
             })
     );
     // Force the waiting service worker to become the active service worker
@@ -45,6 +52,11 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
+    // Skip cross-origin requests
+    if (!event.request.url.startsWith(self.location.origin)) {
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -72,6 +84,9 @@ self.addEventListener('fetch', event => {
                         });
 
                     return response;
+                }).catch(error => {
+                    console.error('Fetch failed:', error);
+                    throw error;
                 });
             })
     );

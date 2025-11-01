@@ -1,9 +1,9 @@
 {
-    "name": "Spin Bike Power",
+    "name": "Spin Bike Power Tracker",
     "short_name": "Bike Power",
     "description": "Track your spin bike power, cadence, and heart rate with Bluetooth sensors",
-    "start_url": "/",
-    "scope": "/",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#1a1a1a",
     "theme_color": "#2196F3",
