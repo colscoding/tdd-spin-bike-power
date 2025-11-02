@@ -7,8 +7,7 @@
     "test:watch": "NODE_ENV=test node --test --watch",
     "start": "parcel index.html",
     "start:test": "NODE_ENV=test parcel index.html",
-    "build": "rm -rf dist/ && parcel build index.html --public-url ./ && npm run build:pwa",
-    "build:pwa": "node build-sw.js",
+    "build": "rm -rf dist/ && parcel build index.html --public-url ./ && ./node_modules/workbox-cli/build/bin.js generateSW workbox-config.js",
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:ui": "NODE_ENV=test playwright test --ui"
   },
@@ -22,6 +21,7 @@
     "@playwright/test": "^1.56.1",
     "jsdom": "^27.0.1",
     "parcel": "^2.16.0",
-    "vitest": "^4.0.4"
+    "vitest": "^4.0.4",
+    "workbox-cli": "^7.3.0"
   }
 }
