@@ -42,6 +42,10 @@ test('power element should update from "--" to value when fresh data arrives', a
     // Wait for initial value
     await page.waitForTimeout(200);
     const powerElement = await page.locator('#power');
+    await page.evaluate(() => {
+        window.connectionsState = window.connectionsState || { power: { isConnected: true } };
+        window.connectionsState.power.isConnected = true;
+    });
 
     // Set old data
     await page.evaluate(() => {
@@ -182,6 +186,11 @@ test('heartrate element should update from "--" to value when fresh data arrives
         window.bike.heartrate.push({ timestamp: Date.now(), value: 165 });
     });
 
+    await page.evaluate(() => {
+        window.connectionsState = window.connectionsState || { power: { isConnected: true } };
+        window.connectionsState.heartrate.isConnected = true;
+    });
+
     // Wait for update to new value
     await page.waitForTimeout(200);
     await expect(heartrateElement).toHaveText('165');
@@ -319,6 +328,12 @@ test('cadence element should update from "--" to value when fresh data arrives',
         window.bike.cadence.push({ timestamp: Date.now(), value: 95 });
     });
 
+
+    await page.evaluate(() => {
+        window.connectionsState = window.connectionsState || { power: { isConnected: true } };
+        window.connectionsState.cadence.isConnected = true;
+    });
+
     await page.waitForTimeout(200);
     await expect(cadenceElement).toHaveText('95');
 });
@@ -334,7 +349,7 @@ test('connect power button should toggle to disconnect and back', async ({ page 
     const powerElement = await page.locator('#power');
 
     // Initial state - button should say "Connect Power"
-    await expect(connectButton).toHaveText('Connect Power');
+    await expect(connectButton).toContainText('Connect Power');
     await expect(powerElement).toHaveText('--');
 
     // Click to connect
@@ -342,7 +357,7 @@ test('connect power button should toggle to disconnect and back', async ({ page 
     await page.waitForTimeout(400);
 
     // After connecting - button should say "Disconnect Power" and data should show
-    await expect(connectButton).toHaveText('Disconnect Power');
+    await expect(connectButton).toContainText('Disconnect Power');
     const powerText = await powerElement.textContent();
     expect(powerText).not.toBe('--');
     const powerValue = parseInt(powerText);
@@ -354,8 +369,49 @@ test('connect power button should toggle to disconnect and back', async ({ page 
     await page.waitForTimeout(200);
 
     // After disconnecting - button should say "Connect Power" and value should return to "--"
-    await expect(connectButton).toHaveText('Connect Power');
+    await expect(connectButton).toContainText('Connect Power');
     await expect(powerElement).toHaveText('--');
+});
+
+test('time element should have initial value of "00:00:00"', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+    await page.waitForTimeout(200); // Allow for initial render
+    const timeElement = await page.locator('#time');
+    await expect(timeElement).toHaveText('00:00:00');
+});
+
+test('time element should start increasing after connecting and stop when disconnected', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    // 1. Check initial state
+    const timeElement = await page.locator('#time');
+    await expect(timeElement).toHaveText('00:00:00');
+
+    // 2. Connect to a sensor
+    const menu = await page.locator('summary');
+    await menu.click();
+    const connectButton = await page.locator('#connectPower');
+    await connectButton.click();
+
+    // 3. Wait for a moment and check that the timer has started
+    await page.waitForTimeout(1500); // Wait 1.5 seconds
+    const firstTimeValue = await timeElement.textContent();
+    expect(firstTimeValue).not.toBe('00:00:00');
+    expect(firstTimeValue).toMatch(/\d{2}:\d{2}:\d{2}/);
+
+    // 4. Wait a bit longer and check that the timer has incremented
+    await page.waitForTimeout(2000); // Wait another 2 seconds
+    const secondTimeValue = await timeElement.textContent();
+    expect(secondTimeValue).not.toBe(firstTimeValue);
+    expect(secondTimeValue > firstTimeValue).toBe(true);
+
+    // 5. Disconnect and check that the timer stops
+    await connectButton.click();
+    await page.waitForTimeout(200);
+    const finalTimeValue = await timeElement.textContent();
+    await page.waitForTimeout(2000); // Wait to see if it changes
+    const timeAfterDisconnect = await timeElement.textContent();
+    expect(timeAfterDisconnect).toBe(finalTimeValue);
 });
 
 

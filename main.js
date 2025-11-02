@@ -7,9 +7,48 @@ import { getTcxString } from './create-tcx.js';
 
 const bikeMeasurements = new MeasurementsState();
 
+const connectionsState = {
+    power: {
+        isConnected: false,
+        disconnect: null,
+    },
+    heartrate: {
+        isConnected: false,
+        disconnect: null,
+    },
+    cadence: {
+        isConnected: false,
+        disconnect: null,
+    }
+};
+
+const timeState = {
+    running: false,
+    startTime: null,
+    endTime: null,
+}
+
+const timeElement = document.getElementById('time');
+setInterval(() => {
+    if (timeState.running && timeState.startTime) {
+        const elapsedMs = Date.now() - timeState.startTime;
+        const totalSeconds = Math.floor(elapsedMs / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        timeElement.textContent =
+            `${hours.toString().padStart(2, '0')}:` +
+            `${minutes.toString().padStart(2, '0')}:` +
+            `${seconds.toString().padStart(2, '0')}`;
+    } else {
+        timeElement.textContent = '00:00:00';
+    }
+}, 100);
+
 // Expose bike to window for testing
 if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
     window.bike = bikeMeasurements;
+    window.connectionsState = connectionsState;
 }
 
 // Keep screen awake during workout
@@ -70,28 +109,14 @@ const emojis = {
     cadence: '🚴',
 };
 
-const state = {
-    power: {
-        isConnected: false,
-        disconnect: null,
-    },
-    heartrate: {
-        isConnected: false,
-        disconnect: null,
-    },
-    cadence: {
-        isConnected: false,
-        disconnect: null,
-    }
-}
 
 const updateMetricDisplay = (key) => {
     const element = elements?.[key]?.display;
-    if (!element || !state?.[key]) {
+    if (!element || !connectionsState?.[key]) {
         return;
     }
     const emptyValue = '--';
-    if (!state?.[key]?.isConnected) {
+    if (!connectionsState?.[key]?.isConnected) {
         element.textContent = emptyValue;
         return;
     }
@@ -122,10 +147,10 @@ setInterval(() => {
 }, 100);
 
 const disconnectFn = (key) => {
-    if (typeof state[key].disconnect === 'function') {
-        state[key].disconnect();
-        state[key].disconnect = null;
-        state[key].isConnected = false;
+    if (typeof connectionsState[key].disconnect === 'function') {
+        connectionsState[key].disconnect();
+        connectionsState[key].disconnect = null;
+        connectionsState[key].isConnected = false;
         const connectElem = elements[key]?.connect;
         if (connectElem?.textContent) {
             connectElem.textContent = `${emojis[key]} Connect ${key.charAt(0).toUpperCase() + key.slice(1)}`;
@@ -134,16 +159,26 @@ const disconnectFn = (key) => {
         if (displayElem?.textContent) {
             displayElem.textContent = '--';
         }
+
+        const allDisconnected = metricTypes.every(k => !connectionsState[k].isConnected);
+        if (allDisconnected) {
+            timeState.running = false;
+            timeState.startTime = null;
+            timeState.endTime = Date.now();
+        }
     }
-}
+};
 
 const connectFn = async (key) => {
     try {
         const { disconnect, addListener } = await connectFns[key]();
 
-        state[key].disconnect = disconnect;
-        state[key].isConnected = true;
-
+        connectionsState[key].disconnect = disconnect;
+        connectionsState[key].isConnected = true;
+        if (!timeState.running) {
+            timeState.running = true;
+            timeState.startTime = Date.now();
+        }
         addListener((entry) => {
             bikeMeasurements.add(key, entry);
         });
@@ -161,7 +196,7 @@ metricTypes.forEach((key) => {
     const connectElem = elements[key]?.connect;
     if (connectElem) {
         connectElem.addEventListener('click', async () => {
-            if (state[key].isConnected) {
+            if (connectionsState[key].isConnected) {
                 disconnectFn(key);
             } else {
                 connectFn(key);
