@@ -4,6 +4,7 @@ import { connectPower } from './connect-power.js';
 import { connectHeartRate } from './connect-heartrate.js';
 import { connectCadence } from './connect-cadence.js';
 import { getTcxString } from './create-tcx.js';
+import { getCsvString } from './create-csv.js';
 
 // Start/Stop button
 const startStopButton = document.getElementById('startStop');
@@ -44,6 +45,8 @@ const getTimestring = (milliseconds) => {
 }
 
 const timeElement = document.getElementById('time');
+const metricsTable = document.getElementById('metricsTable');
+
 setInterval(() => {
     let nextText = '00:00:00'
     if (timeState.startTime && timeState.running) {
@@ -60,6 +63,13 @@ setInterval(() => {
     const nextStartButtonText = timeState.running ? '⏹️' : '▶️';
     if (startStopButton.textContent !== nextStartButtonText) {
         startStopButton.textContent = nextStartButtonText;
+    }
+
+    // Update metrics table styling based on running state
+    if (timeState.running) {
+        metricsTable.classList.remove('paused');
+    } else {
+        metricsTable.classList.add('paused');
     }
 }, 100);
 
@@ -186,10 +196,7 @@ const connectFn = async (key) => {
 
         connectionsState[key].disconnect = disconnect;
         connectionsState[key].isConnected = true;
-        if (!timeState.running) {
-            timeState.running = true;
-            timeState.startTime = Date.now();
-        }
+
         addListener((entry) => {
             measurementsState.add(key, entry);
         });
@@ -247,6 +254,16 @@ exportDataElem.addEventListener('click', () => {
         tcxLink.download = `bike-workout-${timestamp}.tcx`;
         tcxLink.click();
         URL.revokeObjectURL(tcxUrl);
+
+        // Download CSV file
+        const csvString = getCsvString(measurementsState);
+        const csvBlob = new Blob([csvString], { type: 'text/csv' });
+        const csvUrl = URL.createObjectURL(csvBlob);
+        const csvLink = document.createElement('a');
+        csvLink.href = csvUrl;
+        csvLink.download = `bike-workout-${timestamp}.csv`;
+        csvLink.click();
+        URL.revokeObjectURL(csvUrl);
     } catch (error) {
         console.error('Error exporting data:', error);
     }

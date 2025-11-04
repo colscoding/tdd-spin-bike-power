@@ -414,6 +414,31 @@ test('time element should start increasing after connecting and stop when discon
     expect(timeAfterDisconnect).toBe(finalTimeValue);
 });
 
+test('metrics table should have paused styling when not running', async ({ page }) => {
+    await page.goto('http://localhost:1234');
+
+    const metricsTable = await page.locator('#metricsTable');
+    const startStopButton = await page.locator('#startStop');
+
+    // Initially should have paused class
+    await page.waitForTimeout(200);
+    await expect(metricsTable).toHaveClass('paused');
+
+    // Start the workout
+    await startStopButton.click();
+    await page.waitForTimeout(200);
+
+    // Should not have paused class when running
+    await expect(metricsTable).not.toHaveClass('paused');
+
+    // Stop the workout
+    await startStopButton.click();
+    await page.waitForTimeout(200);
+
+    // Should have paused class again
+    await expect(metricsTable).toHaveClass('paused');
+});
+
 test('start/stop button should start timer from stopped state', async ({ page }) => {
     await page.goto('http://localhost:1234');
 

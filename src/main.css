@@ -157,6 +157,13 @@ summary::-webkit-details-marker {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Paused/stopped state styling */
+#metricsTable.paused {
+    opacity: 0.5;
+    filter: grayscale(50%);
 }
 
 #metricsTable dt {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { getValuesAtTimestamps, mergeMeasurements } from './create-tcx.js';
+import { getValuesAtTimestamps, mergeMeasurements } from './merge-measurements.js';
 import { MeasurementsState } from './MeasurementsState.js';
 
 // Tests for getValuesAtTimestamps
