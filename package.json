@@ -6,7 +6,7 @@
     "test": "NODE_ENV=test node --test src/**/*.test.js",
     "test:watch": "NODE_ENV=test node --test --watch src/**/*.test.js",
     "start": "parcel src/index.html",
-    "start:test": "NODE_ENV=test parcel src/index.html",
+    "start:test": "NODE_ENV=test parcel --no-cache src/index.html",
     "build": "./build.sh",
     "test:e2e": "NODE_ENV=test playwright test --config=test-e2e/playwright.config.js",
     "test:e2e:ui": "NODE_ENV=test playwright test --ui --config=test-e2e/playwright.config.js"

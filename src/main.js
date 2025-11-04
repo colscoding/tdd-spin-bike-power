@@ -5,7 +5,10 @@ import { connectHeartRate } from './connect-heartrate.js';
 import { connectCadence } from './connect-cadence.js';
 import { getTcxString } from './create-tcx.js';
 
-const bikeMeasurements = new MeasurementsState();
+// Start/Stop button
+const startStopButton = document.getElementById('startStop');
+
+const measurementsState = new MeasurementsState();
 
 const connectionsState = {
     power: {
@@ -28,26 +31,41 @@ const timeState = {
     endTime: null,
 }
 
+const getTimestring = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return (
+        `${hours.toString().padStart(2, '0')}:` +
+        `${minutes.toString().padStart(2, '0')}:` +
+        `${seconds.toString().padStart(2, '0')}`
+    );
+}
+
 const timeElement = document.getElementById('time');
 setInterval(() => {
-    if (timeState.running && timeState.startTime) {
+    let nextText = '00:00:00'
+    if (timeState.startTime && timeState.running) {
         const elapsedMs = Date.now() - timeState.startTime;
-        const totalSeconds = Math.floor(elapsedMs / 1000);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        timeElement.textContent =
-            `${hours.toString().padStart(2, '0')}:` +
-            `${minutes.toString().padStart(2, '0')}:` +
-            `${seconds.toString().padStart(2, '0')}`;
-    } else {
-        timeElement.textContent = '00:00:00';
+        nextText = getTimestring(elapsedMs);
+    } else if (timeState.startTime && timeState.endTime) {
+        const elapsedMs = timeState.endTime - timeState.startTime;
+        nextText = getTimestring(elapsedMs);
+    }
+    if (timeElement.textContent !== nextText) {
+        timeElement.textContent = nextText;
+    }
+
+    const nextStartButtonText = timeState.running ? '⏹️' : '▶️';
+    if (startStopButton.textContent !== nextStartButtonText) {
+        startStopButton.textContent = nextStartButtonText;
     }
 }, 100);
 
 // Expose bike to window for testing
 if (process.env.NODE_ENV === 'test' && typeof window !== 'undefined') {
-    window.bike = bikeMeasurements;
+    window.bike = measurementsState;
     window.connectionsState = connectionsState;
 }
 
@@ -120,7 +138,7 @@ const updateMetricDisplay = (key) => {
         element.textContent = emptyValue;
         return;
     }
-    const arr = bikeMeasurements[key];
+    const arr = measurementsState[key];
     if (!Array.isArray(arr) || arr.length === 0) {
         element.textContent = emptyValue;
         return;
@@ -159,13 +177,6 @@ const disconnectFn = (key) => {
         if (displayElem?.textContent) {
             displayElem.textContent = '--';
         }
-
-        const allDisconnected = metricTypes.every(k => !connectionsState[k].isConnected);
-        if (allDisconnected) {
-            timeState.running = false;
-            timeState.startTime = null;
-            timeState.endTime = Date.now();
-        }
     }
 };
 
@@ -180,7 +191,7 @@ const connectFn = async (key) => {
             timeState.startTime = Date.now();
         }
         addListener((entry) => {
-            bikeMeasurements.add(key, entry);
+            measurementsState.add(key, entry);
         });
 
         const connectElem = elements[key]?.connect;
@@ -212,9 +223,9 @@ exportDataElem.addEventListener('click', () => {
 
         // Create export data object with all measurements
         const exportData = {
-            power: bikeMeasurements.power,
-            heartrate: bikeMeasurements.heartrate,
-            cadence: bikeMeasurements.cadence,
+            power: measurementsState.power,
+            heartrate: measurementsState.heartrate,
+            cadence: measurementsState.cadence,
         };
 
         // Download JSON file
@@ -228,7 +239,7 @@ exportDataElem.addEventListener('click', () => {
         URL.revokeObjectURL(jsonUrl);
 
         // Download TCX file
-        const tcxString = getTcxString(bikeMeasurements);
+        const tcxString = getTcxString(measurementsState);
         const tcxBlob = new Blob([tcxString], { type: 'application/xml' });
         const tcxUrl = URL.createObjectURL(tcxBlob);
         const tcxLink = document.createElement('a');
@@ -238,6 +249,48 @@ exportDataElem.addEventListener('click', () => {
         URL.revokeObjectURL(tcxUrl);
     } catch (error) {
         console.error('Error exporting data:', error);
+    }
+});
+
+
+startStopButton.addEventListener('click', () => {
+    if (timeState.running) {
+        // Stop the workout (pause it, don't reset)
+        timeState.running = false;
+        timeState.endTime = Date.now();
+
+        // Change button to start
+        startStopButton.textContent = '▶️';
+    } else {
+        // Start/Resume the workout
+        if (timeState.endTime) {
+            // Resuming - adjust startTime to account for time stopped
+            const stoppedDuration = Date.now() - timeState.endTime;
+            timeState.startTime += stoppedDuration;
+            timeState.endTime = null;
+        } else {
+            // Starting fresh
+            timeState.startTime = Date.now();
+        }
+        timeState.running = true;
+        startStopButton.textContent = '⏹️';
+    }
+});
+
+// Discard button - in menu with confirmation dialog
+const discardButton = document.getElementById('discardButton');
+discardButton.addEventListener('click', () => {
+    // Show confirmation dialog
+    if (confirm('Are you sure you want to discard this workout?')) {
+        // Reset time state
+        timeState.running = false;
+        timeState.startTime = null;
+        timeState.endTime = null;
+
+        // Reset measurements
+        measurementsState.power = [];
+        measurementsState.heartrate = [];
+        measurementsState.cadence = [];
     }
 });
 
