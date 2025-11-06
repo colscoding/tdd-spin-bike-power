@@ -82,7 +82,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 0 20px 20px 20px;
     overflow: hidden;
     min-height: 0;
 }

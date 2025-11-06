@@ -21,6 +21,7 @@
     "@playwright/test": "^1.56.1",
     "jsdom": "^27.0.1",
     "parcel": "^2.16.0",
+    "process": "^0.11.10",
     "vitest": "^4.0.4",
     "workbox-cli": "^7.3.0"
   }
