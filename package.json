@@ -5,8 +5,8 @@
   "scripts": {
     "test": "NODE_ENV=test node --test src/**/*.test.js",
     "test:watch": "NODE_ENV=test node --test --watch src/**/*.test.js",
-    "start": "parcel src/index.html",
-    "start:test": "NODE_ENV=test parcel --no-cache src/index.html",
+    "start": "parcel src/index.html --https --cert .certs/localhost-cert.pem --key .certs/localhost-key.pem",
+    "start:test": "NODE_ENV=test npm run start",
     "build": "./build.sh",
     "test:e2e": "NODE_ENV=test playwright test --config=test-e2e/playwright.config.js",
     "test:e2e:ui": "NODE_ENV=test playwright test --ui --config=test-e2e/playwright.config.js"
@@ -23,6 +23,10 @@
     "parcel": "^2.16.0",
     "process": "^0.11.10",
     "vitest": "^4.0.4",
-    "workbox-cli": "^7.3.0"
+    "workbox-cli": "^7.3.0",
+    "workbox-expiration": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-strategies": "^7.3.0"
   }
 }

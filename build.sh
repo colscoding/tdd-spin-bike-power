@@ -1,6 +1,9 @@
 #!/bin/sh
 
+set -e  # Exit on error
 
 rm -rf dist/
-parcel build src/index.html --public-url ./
-./node_modules/workbox-cli/build/bin.js generateSW workbox-config.cjs
+npx parcel build src/index.html --public-url ./
+npx workbox injectManifest workbox-config.cjs
+
+echo "✓ Build completed successfully"

@@ -1,8 +1,8 @@
 {
-    "id": "spin-bike-power-1234",
-    "name": "Spin Bike Power Tracker",
-    "short_name": "Bike Power",
-    "description": "Track your spin bike power, cadence, and heart rate with Bluetooth sensors",
+    "id": "spin-bike-power",
+    "name": "Spin Bike Power",
+    "short_name": "SBP",
+    "description": "Track your spin bike: power, cadence, and heart rate with bluetooth sensors",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
@@ -42,6 +42,12 @@
         {
             "src": "assets/icons/icon-152.png",
             "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/icons/icon-180.png",
+            "sizes": "180x180",
             "type": "image/png",
             "purpose": "any"
         },

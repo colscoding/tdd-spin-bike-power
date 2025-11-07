@@ -5,6 +5,7 @@ import { initConnectionButtons } from './initConnectionButtons.js';
 import { getInitState } from './getInitState.js';
 import { handleWakeLock } from './ui/wakeLock.js';
 import { registerServiceWorker } from './ui/serviceWorker.js';
+import { initInstallPrompt } from './ui/installPrompt.js';
 import { exposeVariablesDuringTest } from './exposeVariablesDuringTest.js';
 
 const { measurementsState, connectionsState, timeState } = getInitState();
@@ -19,3 +20,4 @@ initExportButton(measurementsState);
 
 handleWakeLock();
 registerServiceWorker();
+initInstallPrompt();
