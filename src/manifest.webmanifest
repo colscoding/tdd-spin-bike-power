@@ -1,7 +1,7 @@
 {
     "id": "./",
     "name": "Spin Bike Power",
-    "short_name": "SBP",
+    "short_name": "Spin Bike Power",
     "description": "Track your spin bike: power, cadence, and heart rate with bluetooth sensors",
     "start_url": "./",
     "scope": "./",
