@@ -5,9 +5,11 @@
   "scripts": {
     "test": "NODE_ENV=test node --test src/**/*.test.js",
     "test:watch": "NODE_ENV=test node --test --watch src/**/*.test.js",
-    "start": "parcel src/index.html --https --cert .certs/localhost-cert.pem --key .certs/localhost-key.pem",
+    "dev": "vite --host",
+    "start": "vite --host --https",
     "start:test": "NODE_ENV=test npm run start",
-    "build": "./build.sh",
+    "build": "vite build",
+    "preview": "vite preview --host",
     "deploy": "npm run build && npx gh-pages -d dist",
     "android:init": "npx @bubblewrap/cli init --manifest=https://colscoding.github.io/tdd-spin-bike-power/manifest.webmanifest",
     "android:build": "npx @bubblewrap/cli build",
@@ -27,11 +29,14 @@
     "jsdom": "^27.0.1",
     "parcel": "^2.16.0",
     "process": "^0.11.10",
+    "vite": "^7.2.2",
+    "vite-plugin-pwa": "^1.1.0",
     "vitest": "^4.0.4",
     "workbox-cli": "^7.3.0",
     "workbox-expiration": "^7.3.0",
     "workbox-precaching": "^7.3.0",
     "workbox-routing": "^7.3.0",
-    "workbox-strategies": "^7.3.0"
+    "workbox-strategies": "^7.3.0",
+    "workbox-window": "^7.3.0"
   }
 }

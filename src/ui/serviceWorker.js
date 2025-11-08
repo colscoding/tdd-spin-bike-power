@@ -1,59 +1,42 @@
-import 'process'
+import { registerSW } from 'virtual:pwa-register'
 
 export const registerServiceWorker = () => {
-    // Register service worker for PWA functionality
-    if ('serviceWorker' in navigator && process?.env?.NODE_ENV !== 'test') {
-        window.addEventListener('load', () => {
-            // Use relative path from root - this works in production
-            const swPath = `${window.location.pathname}sw.js`.replace(/\/\//g, '/');
-            navigator.serviceWorker.register(swPath)
-                .then(registration => {
-                    console.log('Service Worker registered successfully:', registration.scope);
-
-                    // Check for updates periodically (every hour)
-                    setInterval(() => {
-                        registration.update();
-                    }, 60 * 60 * 1000);
-
-                    // Listen for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // New service worker available
-                                showUpdateNotification(registration);
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.log('Service Worker registration failed:', error);
-                });
-
-            // Handle when service worker takes control
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
-        });
+    // Register service worker for PWA functionality using vite-plugin-pwa
+    if (process?.env?.NODE_ENV === 'test') {
+        return;
     }
+
+    const updateSW = registerSW({
+        onNeedRefresh() {
+            showUpdateNotification(updateSW);
+        },
+        onOfflineReady() {
+            console.log('App ready to work offline');
+        },
+        onRegisteredSW(swUrl, registration) {
+            console.log('Service Worker registered successfully:', swUrl);
+
+            // Check for updates periodically (every hour)
+            if (registration) {
+                setInterval(() => {
+                    registration.update();
+                }, 60 * 60 * 1000);
+            }
+        },
+        onRegisterError(error) {
+            console.log('Service Worker registration failed:', error);
+        }
+    });
 }
 
-const showUpdateNotification = (registration) => {
+const showUpdateNotification = (updateSW) => {
     const updateContainer = document.getElementById('updateNotification');
     if (updateContainer) {
         updateContainer.style.display = 'block';
 
         const updateButton = document.getElementById('updateButton');
         updateButton.addEventListener('click', () => {
-            if (registration.waiting) {
-                // Tell the service worker to skip waiting
-                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
+            updateSW(true); // Force reload after update
         }, { once: true });
 
         const dismissUpdateButton = document.getElementById('dismissUpdate');
