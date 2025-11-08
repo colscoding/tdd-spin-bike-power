@@ -49,3 +49,12 @@ Thumbs.db
 # Lockfiles (if you prefer to ignore lockfiles, uncomment)
 # package-lock.json
 # yarn.lock
+
+# Android / Bubblewrap
+android/
+app-release-signed.apk
+app-release-unsigned.apk
+*.apk
+*.aab
+twa-manifest.json
+.well-known/

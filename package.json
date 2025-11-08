@@ -9,6 +9,10 @@
     "start:test": "NODE_ENV=test npm run start",
     "build": "./build.sh",
     "deploy": "npm run build && npx gh-pages -d dist",
+    "android:init": "npx @bubblewrap/cli init --manifest=https://colscoding.github.io/tdd-spin-bike-power/manifest.webmanifest",
+    "android:build": "npx @bubblewrap/cli build",
+    "android:install": "npx @bubblewrap/cli install",
+    "android:update": "npx @bubblewrap/cli update --manifest=https://colscoding.github.io/tdd-spin-bike-power/manifest.webmanifest",
     "test:e2e": "NODE_ENV=test playwright test --config=test-e2e/playwright.config.js",
     "test:e2e:ui": "NODE_ENV=test playwright test --ui --config=test-e2e/playwright.config.js"
   },
