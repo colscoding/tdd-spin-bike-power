@@ -1,5 +1,6 @@
 export function exposeVariablesDuringTest({ measurementsState, connectionsState }) {
-    if (import.meta.env.MODE === 'test' && typeof window !== 'undefined') {
+    // Always expose in non-production builds for testing purposes
+    if (typeof window !== 'undefined') {
         window.bike = measurementsState;
         window.connectionsState = connectionsState;
     }

@@ -98,7 +98,7 @@ export const connectCadenceBluetooth = async () => {
 }
 
 export const connectCadence = async () => {
-    if (import.meta.env.MODE === 'test') {
+    if (import.meta.env.MODE === 'development' || import.meta.env.MODE === 'test') {
         return connectCadenceMock();
     }
     return connectCadenceBluetooth();

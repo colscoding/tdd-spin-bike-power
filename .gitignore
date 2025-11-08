@@ -54,3 +54,7 @@ app-release-unsigned.apk
 *.aab
 twa-manifest.json
 .well-known/
+
+
+# vite
+dev-dist
