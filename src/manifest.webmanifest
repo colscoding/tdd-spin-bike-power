@@ -75,14 +75,14 @@
     "screenshots": [
         {
             "src": "assets/screenshots/mobile.png",
-            "sizes": "540x720",
+            "sizes": "381x889",
             "type": "image/png",
             "form_factor": "narrow",
             "label": "Spin Bike Power app displaying real-time metrics on mobile"
         },
         {
             "src": "assets/screenshots/desktop.png",
-            "sizes": "1280x720",
+            "sizes": "1909x956",
             "type": "image/png",
             "form_factor": "wide",
             "label": "Spin Bike Power app displaying real-time metrics on desktop"

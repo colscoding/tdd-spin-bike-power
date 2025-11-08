@@ -4,8 +4,9 @@ export const registerServiceWorker = () => {
     // Register service worker for PWA functionality
     if ('serviceWorker' in navigator && process?.env?.NODE_ENV !== 'test') {
         window.addEventListener('load', () => {
-            const swUrl = new URL('sw.js', document.baseURI).href;
-            navigator.serviceWorker.register(swUrl)
+            // Use relative path from root - this works in production
+            const swPath = `${window.location.pathname}sw.js`.replace(/\/\//g, '/');
+            navigator.serviceWorker.register(swPath)
                 .then(registration => {
                     console.log('Service Worker registered successfully:', registration.scope);
 
