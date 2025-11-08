@@ -57,7 +57,7 @@ export const connectHeartRateBluetooth = async () => {
 }
 
 export const connectHeartRate = async () => {
-    if (process.env.NODE_ENV === 'test') {
+    if (import.meta.env.MODE === 'test') {
         return connectHeartRateMock();
     }
     // Production implementation would go here

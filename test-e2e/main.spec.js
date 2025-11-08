@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import fs from 'fs';
 
 test('power element should have initial value of "--"', async ({ page }) => {
-    // Navigate to the page served by Parcel
-    await page.goto('http://localhost:1234');
+    // Navigate to the page served by Vite
+    await page.goto('http://localhost:5173');
 
     // Wait for the power element to be updated
     await page.waitForTimeout(200);
@@ -14,7 +14,7 @@ test('power element should have initial value of "--"', async ({ page }) => {
 });
 
 test('power element should show "--" when data is older than 3 seconds', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial value to be set
     await page.waitForTimeout(200);
@@ -37,7 +37,7 @@ test('power element should show "--" when data is older than 3 seconds', async (
 });
 
 test('power element should update from "--" to value when fresh data arrives', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial value
     await page.waitForTimeout(200);
@@ -68,7 +68,7 @@ test('power element should update from "--" to value when fresh data arrives', a
 });
 
 test('power should be "--" initially, then show value 0-3000 after clicking connect', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial load
     await page.waitForTimeout(200);
@@ -99,8 +99,8 @@ test('power should be "--" initially, then show value 0-3000 after clicking conn
 });
 
 test('heartrate element should have initial value of "--"', async ({ page }) => {
-    // Navigate to the page served by Parcel
-    await page.goto('http://localhost:1234');
+    // Navigate to the page served by Vite
+    await page.goto('http://localhost:5173');
 
     // Wait for the heartrate element to be updated
     await page.waitForTimeout(200);
@@ -111,7 +111,7 @@ test('heartrate element should have initial value of "--"', async ({ page }) => 
 });
 
 test('heartrate should be "--" initially, then show value 1-299 after clicking connect', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial load
     await page.waitForTimeout(200);
@@ -142,7 +142,7 @@ test('heartrate should be "--" initially, then show value 1-299 after clicking c
 });
 
 test('heartrate element should show "--" when data is older than 3 seconds', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial value to be set
     await page.waitForTimeout(200);
@@ -165,7 +165,7 @@ test('heartrate element should show "--" when data is older than 3 seconds', asy
 });
 
 test('heartrate element should update from "--" to value when fresh data arrives', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Wait for initial value
     await page.waitForTimeout(200);
@@ -197,7 +197,7 @@ test('heartrate element should update from "--" to value when fresh data arrives
 });
 
 test('export button should download all measurements as JSON', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Add some test data
     await page.evaluate(() => {
@@ -250,7 +250,7 @@ test('export button should download all measurements as JSON', async ({ page }) 
 });
 
 test('cadence element should have initial value of "--"', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     await page.waitForTimeout(200);
 
@@ -259,7 +259,7 @@ test('cadence element should have initial value of "--"', async ({ page }) => {
 });
 
 test('cadence should be "--" initially, then show value 1-299 after clicking connect', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     await page.waitForTimeout(200);
     const cadenceElement = await page.locator('#cadence');
@@ -289,7 +289,7 @@ test('cadence should be "--" initially, then show value 1-299 after clicking con
 });
 
 test('cadence element should show "--" when data is older than 3 seconds', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     await page.waitForTimeout(200);
     const cadenceElement = await page.locator('#cadence');
@@ -309,7 +309,7 @@ test('cadence element should show "--" when data is older than 3 seconds', async
 });
 
 test('cadence element should update from "--" to value when fresh data arrives', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     await page.waitForTimeout(200);
     const cadenceElement = await page.locator('#cadence');
@@ -339,7 +339,7 @@ test('cadence element should update from "--" to value when fresh data arrives',
 });
 
 test('connect power button should toggle to disconnect and back', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // Open the menu
     const menu = await page.locator('summary');
@@ -374,14 +374,14 @@ test('connect power button should toggle to disconnect and back', async ({ page 
 });
 
 test('time element should have initial value of "00:00:00"', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
     await page.waitForTimeout(200); // Allow for initial render
     const timeElement = await page.locator('#time');
     await expect(timeElement).toHaveText('00:00:00');
 });
 
 test('time element should start increasing after connecting and stop when disconnected', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     // 1. Check initial state
     const timeElement = await page.locator('#time');
@@ -415,7 +415,7 @@ test('time element should start increasing after connecting and stop when discon
 });
 
 test('metrics table should have paused styling when not running', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const metricsTable = await page.locator('#metricsTable');
     const startStopButton = await page.locator('#startStop');
@@ -440,7 +440,7 @@ test('metrics table should have paused styling when not running', async ({ page 
 });
 
 test('start/stop button should start timer from stopped state', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const timeElement = await page.locator('#time');
     const startStopButton = await page.locator('#startStop');
@@ -463,7 +463,7 @@ test('start/stop button should start timer from stopped state', async ({ page })
 });
 
 test('start/stop button should pause timer without resetting data', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const timeElement = await page.locator('#time');
     const startStopButton = await page.locator('#startStop');
@@ -518,7 +518,7 @@ test('start/stop button should pause timer without resetting data', async ({ pag
 });
 
 test('stop should not disconnect sensors', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const startStopButton = await page.locator('#startStop');
     const menu = await page.locator('summary');
@@ -546,7 +546,7 @@ test('stop should not disconnect sensors', async ({ page }) => {
 });
 
 test('discard button should clear timer and measurements with confirmation', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const timeElement = await page.locator('#time');
     const startStopButton = await page.locator('#startStop');
@@ -609,7 +609,7 @@ test('discard button should clear timer and measurements with confirmation', asy
 });
 
 test('discard button should disconnect all sensors', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const startStopButton = await page.locator('#startStop');
     const menu = await page.locator('summary');
@@ -645,7 +645,7 @@ test('discard button should disconnect all sensors', async ({ page }) => {
 });
 
 test('export button should download measurements', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const startStopButton = await page.locator('#startStop');
     const menu = await page.locator('summary');
@@ -682,7 +682,7 @@ test('export button should download measurements', async ({ page }) => {
 });
 
 test('resume after stop should continue from stopped time', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const timeElement = await page.locator('#time');
     const startStopButton = await page.locator('#startStop');
@@ -714,7 +714,7 @@ test('resume after stop should continue from stopped time', async ({ page }) => 
 });
 
 test('start/stop allows starting workout before connecting sensors', async ({ page }) => {
-    await page.goto('http://localhost:1234');
+    await page.goto('http://localhost:5173');
 
     const timeElement = await page.locator('#time');
     const startStopButton = await page.locator('#startStop');

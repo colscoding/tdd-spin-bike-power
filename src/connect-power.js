@@ -58,7 +58,7 @@ export const connectPowerBluetooth = async () => {
 
 
 export const connectPower = async () => {
-    if (process.env.NODE_ENV === 'test') {
+    if (import.meta.env.MODE === 'test') {
         return connectPowerMock();
     }
     return connectPowerBluetooth();
