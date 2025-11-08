@@ -2,7 +2,7 @@ import { registerSW } from 'virtual:pwa-register'
 
 export const registerServiceWorker = () => {
     // Register service worker for PWA functionality using vite-plugin-pwa
-    if (process?.env?.NODE_ENV === 'test') {
+    if (import.meta.env.MODE === 'test') {
         return;
     }
 

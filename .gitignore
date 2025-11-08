@@ -5,13 +5,13 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Parcel / build artifacts
+# Build artifacts
 .dist/
 dist/
 build/
-.cache/
-.parcel-cache/
-.cache-loader/
+
+# Vite
+.vite/
 
 # Playwright
 .playwright/
@@ -41,10 +41,6 @@ Thumbs.db
 *.tmp
 *.temp
 .tmp/
-
-# Parcel cache and other caches
-.cache/
-.parcel-cache/
 
 # Lockfiles (if you prefer to ignore lockfiles, uncomment)
 # package-lock.json

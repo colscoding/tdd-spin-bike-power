@@ -1,9 +1,7 @@
-import 'process';
-
 let deferredPrompt = null;
 
 export const initInstallPrompt = () => {
-    if (process?.env?.NODE_ENV === 'test') {
+    if (import.meta.env.MODE === 'test') {
         return;
     }
 
