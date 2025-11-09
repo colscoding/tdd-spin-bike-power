@@ -40,8 +40,8 @@ else
     echo "4. Install on device:      npm run android:install\n"
     
     echo "After initialization, you can customize:"
-    echo "  - Package name in twa-manifest.json"
-    echo "  - App colors and icons"
+    echo "  - Package name in android/twa-manifest.json"
+    echo "  - App colors and icons in android/app/"
     echo "  - Digital Asset Links\n"
 fi
 

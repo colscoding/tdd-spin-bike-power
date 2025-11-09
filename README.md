@@ -21,3 +21,36 @@ Track your spin bike: power, cadence, and heart rate with Bluetooth sensors.
 - **PWA**: vite-plugin-pwa with Workbox
 - **Testing**: Node.js test runner, Playwright
 - **Deployment**: GitHub Pages
+- **Android**: Bubblewrap TWA (see `android/` folder)
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Run unit tests
+npm test
+
+# Run E2E tests
+npm run test:e2e
+
+# Build for production
+npm run build
+
+# Deploy to GitHub Pages
+npm run deploy
+```
+
+## Android APK
+
+To build an Android APK, see the [`android/` folder](./android/README.md) for instructions.
+
+```bash
+npm run android:init    # Initialize (first time)
+npm run android:build   # Build APK
+npm run android:install # Install on device
+```

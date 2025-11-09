@@ -47,12 +47,24 @@ Thumbs.db
 # yarn.lock
 
 # Android / Bubblewrap
-android/
-app-release-signed.apk
-app-release-unsigned.apk
-*.apk
-*.aab
-twa-manifest.json
+android/.gradle/
+android/gradle
+android/build/
+android/app/build/
+android/app/.cxx/
+android/app/release/
+android/app/src/main/assets/
+android/local.properties
+android/*.apk
+android/*.aab
+android/*.idsig
+android/*-aligned.apk
+android/twa-manifest.json
+android/manifest-checksum.txt
+android/*.keystore
+android/*.jks
+android/captures/
+android/output.json
 .well-known/
 
 
